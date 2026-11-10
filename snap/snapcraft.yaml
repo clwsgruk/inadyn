@@ -1,5 +1,5 @@
 name: inadyn
-adopt-info: inadyn
+version: "2.13.0"
 summary: Internet Automated Dynamic DNS Client
 description: |
   Inadyn is a small and simple Dynamic DNS, DDNS, client with HTTPS support.
@@ -8,6 +8,12 @@ description: |
   name in sync with your public¹ IP address. It can also be used in installations
   with redundant (backup) connections to the Internet.
 base: core20
+architectures:
+  - build-on: amd64
+  - build-on: arm64
+  - build-on: armhf
+  - build-on: ppc64el
+  - build-on: s390x
 confinement: strict
 grade: stable
 
@@ -51,19 +57,7 @@ parts:
     plugin: autotools
     source: https://github.com/troglobit/inadyn.git
     source-type: git
-    override-pull: |
-      snapcraftctl pull
-      last_committed_tag="$(git describe --tags --abbrev=0)"
-      last_released_tag="$(snap info $SNAPCRAFT_PROJECT_NAME | awk '$1 == "latest/beta:" { print $2 }')"
-      # If the latest tag from the upstream project has not been released to
-      # beta, build that tag instead of master.
-      if [ "${last_committed_tag}" != "${last_released_tag}" ]; then
-        git fetch
-        git checkout "${last_committed_tag}"
-        snapcraftctl set-version "${last_committed_tag#v}"
-      else
-        snapcraftctl set-version "$(git rev-parse --short HEAD)"
-      fi
+    source-tag: v$SNAPCRAFT_PROJECT_VERSION
     autotools-configure-parameters: ['--prefix=/usr', '--sysconfdir=/etc']
     override-build: |
       snapcraftctl build
