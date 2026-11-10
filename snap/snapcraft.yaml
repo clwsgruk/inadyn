@@ -7,13 +7,13 @@ description: |
   routers and Internet gateways to automate the task of keeping your Internet
   name in sync with your public¹ IP address. It can also be used in installations
   with redundant (backup) connections to the Internet.
-base: core20
-architectures:
-  - build-on: amd64
-  - build-on: arm64
-  - build-on: armhf
-  - build-on: ppc64el
-  - build-on: s390x
+base: core26
+platforms:
+  amd64:
+  arm64:
+  armhf:
+  ppc64el:
+  s390x:
 confinement: strict
 grade: stable
 
@@ -36,6 +36,8 @@ parts:
   snapcraft-preload:
       source: https://github.com/sergiusens/snapcraft-preload.git
       plugin: cmake
+      cmake-parameters:
+        - -DCMAKE_POLICY_VERSION_MINIMUM=3.5
       # The upstream launcher loads $SNAP/lib/libsnapcraft-preload.so.
       organize:
         usr/local/lib: lib
@@ -43,6 +45,9 @@ parts:
         - on amd64:
           - gcc-multilib
           - g++-multilib
+      stage-packages:
+        - on amd64:
+          - lib32stdc++6
   libconfuse:
     plugin: autotools
     source: https://github.com/martinh/libconfuse/releases/download/v3.2.1/confuse-3.2.1.tar.xz
@@ -63,17 +68,18 @@ parts:
     source-tag: v$SNAPCRAFT_PROJECT_VERSION
     autotools-configure-parameters: ['--prefix=/usr', '--sysconfdir=/etc']
     override-build: |
-      snapcraftctl build
-      echo '#!/bin/bash' > $SNAPCRAFT_PART_INSTALL/bin/configpath
-      echo 'echo $SNAP_DATA/inadyn.conf' >> $SNAPCRAFT_PART_INSTALL/bin/configpath
-      chmod +x $SNAPCRAFT_PART_INSTALL/bin/configpath
+      craftctl default
+      mkdir -p "$CRAFT_PART_INSTALL/bin"
+      echo '#!/bin/bash' > $CRAFT_PART_INSTALL/bin/configpath
+      echo 'echo $SNAP_DATA/inadyn.conf' >> $CRAFT_PART_INSTALL/bin/configpath
+      chmod +x $CRAFT_PART_INSTALL/bin/configpath
     build-packages:
       - libgnutls28-dev
       - pkg-config
     stage-packages:
       - iproute2
-      - libatm1
-      - libgnutls30
+      - libatm1t64
+      - libgnutls30t64
     prime:
       - -usr/share/doc
 
