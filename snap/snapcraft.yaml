@@ -17,13 +17,9 @@ grade: stable
 
 apps:
   inadyn:
-    command-chain:
-      - usr/local/bin/snapcraft-preload
     command: usr/sbin/inadyn -f $SNAP_DATA/inadyn.conf --cache-dir $SNAP_DATA/cache -P $SNAP_DATA/inadyn.pid
     plugs: [network, network-observe]
   daemon:
-    command-chain:
-      - usr/local/bin/snapcraft-preload
     command: usr/sbin/inadyn -n -s -f $SNAP_DATA/inadyn.conf --cache-dir $SNAP_DATA/cache -P $SNAP_DATA/inadyn.pid
     plugs: [network, network-observe]
     daemon: simple
@@ -31,21 +27,6 @@ apps:
     command: bin/configpath
 
 parts:
-  snapcraft-preload:
-      source: https://github.com/sergiusens/snapcraft-preload.git
-      plugin: cmake
-      cmake-parameters:
-        - -DCMAKE_POLICY_VERSION_MINIMUM=3.5
-      # The upstream launcher loads $SNAP/lib/libsnapcraft-preload.so.
-      organize:
-        usr/local/lib: lib
-      build-packages:
-        - on amd64:
-          - gcc-multilib
-          - g++-multilib
-      stage-packages:
-        - on amd64:
-          - lib32stdc++6
   libconfuse:
     plugin: autotools
     source: https://github.com/martinh/libconfuse/releases/download/v3.2.1/confuse-3.2.1.tar.xz
@@ -59,7 +40,7 @@ parts:
       - -usr/share/doc
 
   inadyn:
-    after: [libconfuse, snapcraft-preload]
+    after: [libconfuse]
     plugin: autotools
     source: https://github.com/troglobit/inadyn.git
     source-type: git
