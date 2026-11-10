@@ -36,6 +36,9 @@ parts:
   snapcraft-preload:
       source: https://github.com/sergiusens/snapcraft-preload.git
       plugin: cmake
+      # The upstream launcher loads $SNAP/lib/libsnapcraft-preload.so.
+      organize:
+        usr/local/lib: lib
       build-packages:
         - on amd64:
           - gcc-multilib
